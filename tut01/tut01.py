@@ -1,9 +1,14 @@
-# Write a python code to calculate the fatorial of a given number.
-arr_fact = [1, 1]
-def factorial(x):
-    for n in range(2, x + 1):
-        arr_fact.append(n*arr_fact[n - 1])
-    print(arr_fact[x])
+def octact_identification(mod=5000):
+###Code
 
-num = int(input("Enter the number whose factorial is to be found: "))
-factorial(num)
+
+from platform import python_version
+ver = python_version()
+
+if ver == "3.8.10":
+    print("Correct Version Installed")
+else:
+    print("Please install 3.8.10. Instruction are present in the GitHub Repo/Webmail. Url: https://pastebin.com/nvibxmjw")
+
+mod=5000
+octact_identification(mod)
