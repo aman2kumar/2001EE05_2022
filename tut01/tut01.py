@@ -35,10 +35,16 @@ def octact_identification(mod = 5000):
     V_avg = df["V"].mean()
     W_avg = df["W"].mean()
 
+    # Adding Columns of respective averages calculated above in first row
+    df.loc[df.index[0], 'U Avg'] = U_avg
+    df.loc[df.index[0], 'V Avg'] = V_avg
+    df.loc[df.index[0], 'W Avg'] = W_avg
+
     # Done preprocessing by subtracting averages from original U, V and W
-    df["U"] = df["U"] - U_avg
-    df["V"] = df["V"] - V_avg
-    df["W"] = df["W"] - W_avg
+    # and forming new columns respectively
+    df["U' = U - U_avg"] = df["U"] - U_avg
+    df["V' = V - V_avg"] = df["V"] - V_avg
+    df["W' = W - W_avg"] = df["W"] - W_avg
 
     # Constructing a new column of Octant and applying logic given below
     # Using lambda function on a particular row to find its octant via pre defined function (label_octant())
@@ -46,6 +52,9 @@ def octact_identification(mod = 5000):
 
     # Printing dataframe df
     print(df)
+
+    # Forming csv file from the dataframe
+    df.to_csv('octant_output.csv', index = False)
 
 
 ver = python_version()
