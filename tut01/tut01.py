@@ -53,9 +53,23 @@ def octact_identification(mod = 5000):
     # Adding Column of User Input
     df.at[1, 11] = 'User Input'
 
+    # Adding value of mod at respective row and column
+    df.at[1, 'Octant ID'] = 'Mod ' + str(mod)
+
     # Calculated total rows in dataframe to get the iteration of the for loop
     total_rows = len(df.axes[0])
     iteration = total_rows/mod
+
+    # Added the total count of different octant values in their respective columns
+    df.at[0, 'Octant ID'] = 'Overall Count'
+    df.at[0, '1'] = len((df[df["Octant"] == 1]).axes[0])
+    df.at[0, '-1'] = len((df[df["Octant"] == -1]).axes[0])
+    df.at[0, '2'] = len((df[df["Octant"] == 2]).axes[0])
+    df.at[0, '-2'] = len((df[df["Octant"] == -2]).axes[0])
+    df.at[0, '3'] = len((df[df["Octant"] == 3]).axes[0])
+    df.at[0, '-3'] = len((df[df["Octant"] == -3]).axes[0])
+    df.at[0, '4'] = len((df[df["Octant"] == 4]).axes[0])
+    df.at[0,'-4'] = len((df[df["Octant"] == -4]).axes[0])
 
     # For loop to give the count of octants in the ranges of given mod value
     for i in range(int(iteration) + 1):
