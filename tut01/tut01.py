@@ -50,7 +50,7 @@ def octact_identification(mod = 5000):
     # Using lambda function on a particular row to find its octant via pre defined function (label_octant())
     df["Octant"] = df.apply(lambda row: label_octant(row), axis = 1)
 
-    # Adding Column of User Input
+    # Adding Column of User Input at respective value of row and column
     df.at[1, 11] = 'User Input'
 
     # Adding value of mod at respective row and column
@@ -61,6 +61,8 @@ def octact_identification(mod = 5000):
     iteration = total_rows/mod
 
     # Added the total count of different octant values in their respective columns
+    # ex- count_1 = len of dataframe df_range whose Octant value == 1
+    # axes[0] => 0 corresponds to rows
     df.at[0, 'Octant ID'] = 'Overall Count'
     df.at[0, '1'] = len((df[df["Octant"] == 1]).axes[0])
     df.at[0, '-1'] = len((df[df["Octant"] == -1]).axes[0])
@@ -76,9 +78,11 @@ def octact_identification(mod = 5000):
 
         # Divided original dataframe in range based on no. of loops
         # ex- for loop1 range = 0 to 5000, loop2 range = 5001 to 10000 and so on..
-        df_range = df[i*mod: (i + 1)*mod]
+        df_range = df[i*mod: (i + 1)*mod - 1]
 
         # Calculated counts of different octant values for particular range
+        # ex- count_1 = len of dataframe df_range whose Octant value == 1
+        # axes[0] => 0 corresponds to rows
         count_1 = len((df_range[df_range["Octant"] == 1]).axes[0])
         count_neg1 = len((df_range[df_range["Octant"] == -1]).axes[0])
         count_2 = len((df_range[df_range["Octant"] == 2]).axes[0])
@@ -88,8 +92,14 @@ def octact_identification(mod = 5000):
         count_4 = len((df_range[df_range["Octant"] == 4]).axes[0])
         count_neg4 = len((df_range[df_range["Octant"] == -4]).axes[0])
 
-        # Added the value of counts in respective rows and columns 
-        df.at[i + 2, 'Octant ID'] = str(i*mod) + ' - ' + str((i+1)*mod)
+        # Defined range based on loop value
+        # For last loop range = i*mod to total_rows else shown below
+        if i != int(iteration):
+            df.at[i + 2, 'Octant ID'] = str(i*mod) + ' - ' + str((i+1)*mod - 1)
+        else:
+            df.at[i + 2, 'Octant ID'] = str(i*mod) + ' - ' + str(total_rows)
+
+        # Added the value of counts in respective rows and columns
         df.at[i + 2, '1'] = count_1
         df.at[i + 2, '-1'] = count_neg1
         df.at[i + 2, '2'] = count_2
