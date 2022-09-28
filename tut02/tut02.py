@@ -41,6 +41,83 @@ for i in range(2, row_count + 1):
     IF( AND(H{i}<0, I{i}<0, J{i}<0), "-3", IF( AND(H{i}>=0, I{i}<0, J{i}>0), "+4", IF( AND(H{i}>=0, I{i}<0, J{i}<0), "-4"))))))))'''
 
 def octant_transition_count(mod = 5000):
+    # Assigning respective cell value
+    sheet['L3'] = 'User Input'
+    sheet['M2'] = 'Overall Count'
+    sheet['M3'] = 'Mod' + str(mod)
+    sheet['M13'] = 'Overall Transition Count'
+    sheet['M15'] = 'Count'
+    sheet['L16'] = 'From'
+    sheet['N14'] = 'To'
+
+    sheet['N1'] = sheet['N15'] = sheet['M16'] = '+1'
+    sheet['O1'] = sheet['O15'] = sheet['M17'] = '-1'
+    sheet['P1'] = sheet['P15'] = sheet['M18'] = '+2'
+    sheet['Q1'] = sheet['Q15'] = sheet['M19'] = '-2'
+    sheet['R1'] = sheet['R15'] = sheet['M20'] = '+3'
+    sheet['S1'] = sheet['S15'] = sheet['M21'] = '-3'
+    sheet['T1'] = sheet['T15'] = sheet['M22'] = '+4'
+    sheet['U1'] = sheet['U15'] = sheet['M23'] = '-4'
+
+    # Direct formula to find the total count of a particular octant value
+    sheet['N2'] = f'= COUNTIF($K$2:$K${row_count},N1)'
+    sheet['O2'] = f'= COUNTIF($K$2:$K${row_count},O1)'
+    sheet['P2'] = f'= COUNTIF($K$2:$K${row_count},P1)'
+    sheet['Q2'] = f'= COUNTIF($K$2:$K${row_count},Q1)'
+    sheet['R2'] = f'= COUNTIF($K$2:$K${row_count},R1)'
+    sheet['S2'] = f'= COUNTIF($K$2:$K${row_count},S1)'
+    sheet['T2'] = f'= COUNTIF($K$2:$K${row_count},T1)'
+    sheet['U2'] = f'= COUNTIF($K$2:$K${row_count},U1)'
+
+    # No of iterations for the below loop
+    iter = row_count//mod
+
+    for i in range(iter + 1):
+        # start = starting value of a given range
+        # end = ending value of a given range
+        start = i*mod
+        end = (i + 1)*mod - 1
+        sheet[f'M{4 + i}'] = f'{start} - {end}'
+
+        # Direct formula to find the total count of a particular octant value in given range
+        # from start + 2 to end + 2
+        sheet[f'N{4 + i}'] = f'= COUNTIF($K${start + 2}:$K${end + 2},N1)'
+        sheet[f'O{4 + i}'] = f'= COUNTIF($K${start + 2}:$K${end + 2},O1)'
+        sheet[f'P{4 + i}'] = f'= COUNTIF($K${start + 2}:$K${end + 2},P1)'
+        sheet[f'Q{4 + i}'] = f'= COUNTIF($K${start + 2}:$K${end + 2},Q1)'
+        sheet[f'R{4 + i}'] = f'= COUNTIF($K${start + 2}:$K${end + 2},R1)'
+        sheet[f'S{4 + i}'] = f'= COUNTIF($K${start + 2}:$K${end + 2},S1)'
+        sheet[f'T{4 + i}'] = f'= COUNTIF($K${start + 2}:$K${end + 2},T1)'
+        sheet[f'U{4 + i}'] = f'= COUNTIF($K${start + 2}:$K${end + 2},U1)'
+
+        sheet[f'M{5 + iter}'] = 'Verified'
+        # Adding verified row by finding sumof the respective columns
+        sheet[f'N{5 + iter}'] = f'= SUM(N4:N{4 + iter})'
+        sheet[f'O{5 + iter}'] = f'= SUM(O4:O{4 + iter})'
+        sheet[f'P{5 + iter}'] = f'= SUM(P4:P{4 + iter})'
+        sheet[f'Q{5 + iter}'] = f'= SUM(Q4:Q{4 + iter})'
+        sheet[f'R{5 + iter}'] = f'= SUM(R4:R{4 + iter})'
+        sheet[f'S{5 + iter}'] = f'= SUM(S4:S{4 + iter})'
+        sheet[f'T{5 + iter}'] = f'= SUM(T4:T{4 + iter})'
+        sheet[f'U{5 + iter}'] = f'= SUM(U4:U{4 + iter})'
+
+        # Assigning cell values for Transition count tables for each iteration
+        sheet[f'L{30 + i*13}'] = 'From'
+        sheet[f'M{27 + i*13}'] = 'Mod Transition Count'
+        sheet[f'M{28 + i*13}'] = f'{start} - {end}'
+        sheet[f'M{29 + i*13}'] = 'Count'
+        sheet[f'N{28 + i*13}'] = 'To'
+
+        sheet[f'N{29 + i*13}'] = sheet[f'M{30 + i*13}'] = '+1'
+        sheet[f'O{29 + i*13}'] = sheet[f'M{31 + i*13}'] = '-1'
+        sheet[f'P{29 + i*13}'] = sheet[f'M{32 + i*13}'] = '+2'
+        sheet[f'Q{29 + i*13}'] = sheet[f'M{33 + i*13}'] = '-2'
+        sheet[f'R{29 + i*13}'] = sheet[f'M{34 + i*13}'] = '+3'
+        sheet[f'S{29 + i*13}'] = sheet[f'M{35 + i*13}'] = '-3'
+        sheet[f'T{29 + i*13}'] = sheet[f'M{36 + i*13}'] = '+4'
+        sheet[f'U{29 + i*13}'] = sheet[f'M{37 + i*13}'] = '-4'
+
+    # Saving the Output file
     wb.save("output_octant_transition_identify.xlsx")
 
 
