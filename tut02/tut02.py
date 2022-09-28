@@ -31,6 +31,14 @@ for i in range(2, row_count + 1):
     sheet['I' + str(i)] = '= C{} - F2'.format(i)
     sheet['J' + str(i)] = '= D{} - G2'.format(i)
 
+# Creating Octant Column
+sheet['K1'] = "Octant"
+
+for i in range(2, row_count + 1):
+    # Direct formula for Counting a particular occurence according to the conditions
+    sheet[f'K{i}'] = f'''= IF( AND(H{i}>=0, I{i}>=0, J{i}>=0), "+1", IF( AND(H{i}>=0, I{i}>=0, J{i}<0), "-1",
+    IF( AND(H{i}<0, I{i}>=0, J{i}>0), "+2", IF( AND(H{i}<0, I{i}>=0, J{i}<0), "-2", IF( AND(H{i}<0, I{i}<0, J{i}>0), "+3",
+    IF( AND(H{i}<0, I{i}<0, J{i}<0), "-3", IF( AND(H{i}>=0, I{i}<0, J{i}>0), "+4", IF( AND(H{i}>=0, I{i}<0, J{i}<0), "-4"))))))))'''
 
 def octant_transition_count(mod = 5000):
     wb.save("output_octant_transition_identify.xlsx")
