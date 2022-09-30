@@ -69,6 +69,15 @@ def octant_transition_count(mod = 5000):
     sheet['T2'] = f'= COUNTIF($K$2:$K${row_count},T1)'
     sheet['U2'] = f'= COUNTIF($K$2:$K${row_count},U1)'
 
+
+    # Creating a temporary column containg one next values of octant
+    sheet['AM1'] = "Temp_Column"
+    for i in range(row_count):
+        sheet[f'AM{i + 2}'] = f'= K{i + 3}'
+
+    # Creating List of cols value which will be used later
+    cols = ['+1', '-1', '+2', '-2', '+3', '-3', '+4', '-4']
+    
     # No of iterations for the below loop
     iter = row_count//mod
 
@@ -117,9 +126,32 @@ def octant_transition_count(mod = 5000):
         sheet[f'T{29 + i*13}'] = sheet[f'M{36 + i*13}'] = '+4'
         sheet[f'U{29 + i*13}'] = sheet[f'M{37 + i*13}'] = '-4'
 
+        # Finding Transition count by comparing 2 columns, one of which contains one next values of the octant
+        for j in range(8):
+            sheet[f'N{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $AM${start + 2}:$AM${end + 2}, "+1")'
+            sheet[f'O{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $AM${start + 2}:$AM${end + 2}, "-1")'
+            sheet[f'P{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $AM${start + 2}:$AM${end + 2}, "+2")'
+            sheet[f'Q{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $AM${start + 2}:$AM${end + 2}, "-2")'
+            sheet[f'R{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $AM${start + 2}:$AM${end + 2}, "+3")'
+            sheet[f'S{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $AM${start + 2}:$AM${end + 2}, "-3")'
+            sheet[f'T{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $AM${start + 2}:$AM${end + 2}, "+4")'
+            sheet[f'U{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $AM${start + 2}:$AM${end + 2}, "-4")'
+
+    
+    # Finding overall Transition count by comparing 2 columns same as above
+    for j in range(8):
+        sheet[f'N{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "+1")'
+        sheet[f'O{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "-1")'
+        sheet[f'P{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "+2")'
+        sheet[f'Q{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "-2")'
+        sheet[f'R{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "+3")'
+        sheet[f'S{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "-3")'
+        sheet[f'T{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "+4")'
+        sheet[f'U{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "-4")'
+
+
     # Saving the Output file
     wb.save("output_octant_transition_identify.xlsx")
-
 
 ver = python_version()
 
