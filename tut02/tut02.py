@@ -1,13 +1,18 @@
 # Importing different modules
+from msilib.schema import Font
 from platform import python_version
 # A Python library to read/write Excel file
 import openpyxl as op
+# For changing the style of a particular cell like changing colours, fonts or apply borders
+from openpyxl.styles import PatternFill, Font
 
 # Loading the given input file in a Workbook
 wb = op.load_workbook('input_octant_transition_identify.xlsx')
 
 # Selecting the current active sheet
 sheet = wb.active
+
+ws = wb.get_sheet_by_name('sheet')
 
 sheet['E1'] = "U_Avg"  
 sheet['F1'] = "V_Avg"
@@ -43,8 +48,17 @@ for i in range(2, row_count + 1):
 def octant_transition_count(mod = 5000):
     # Assigning respective cell value
     sheet['L3'] = 'User Input'
+    # Fills the selected colour in the chosen cell
+    sheet['L3'].fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
+
     sheet['M2'] = 'Overall Count'
-    sheet['M3'] = 'Mod' + str(mod)
+
+    sheet['M3'] = 'Mod ' + str(mod)
+    # Fills the selected colour in the chosen cell
+    sheet['M3'].fill = PatternFill(start_color='BBECCD', end_color='BBECCD', fill_type='solid')
+    # Changes the font colour with the desired one
+    sheet['M3'].font = Font(color='005C29')
+    
     sheet['M13'] = 'Overall Transition Count'
     sheet['M15'] = 'Count'
     sheet['L16'] = 'From'
@@ -77,7 +91,7 @@ def octant_transition_count(mod = 5000):
 
     # Creating List of cols value which will be used later
     cols = ['+1', '-1', '+2', '-2', '+3', '-3', '+4', '-4']
-    
+
     # No of iterations for the below loop
     iter = row_count//mod
 
