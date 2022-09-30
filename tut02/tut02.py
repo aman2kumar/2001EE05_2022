@@ -6,13 +6,25 @@ import openpyxl as op
 # For changing the style of a particular cell like changing colours, fonts or apply borders
 from openpyxl.styles import PatternFill, Font
 
-# Loading the given input file in a Workbook
-wb = op.load_workbook('input_octant_transition_identify.xlsx')
+try:
+    # Loading the given input file in a Workbook
+    wb = op.load_workbook('input_octant_transition_identify.xlsx')
+    # Above line can have error if input file has wrong format
+    # other than .xlsx
 
-# Selecting the current active sheet
-sheet = wb.active
+except Exception as e:  # Exception = openpyxl.utils.exceptions.InvalidFileException
+    print("There was some error due to " + str(e))
 
-ws = wb.get_sheet_by_name('sheet')
+
+try:
+    # Selecting the current active sheet
+    sheet = wb.active
+    # Above line can have error if input file is read only workbook
+    # and we are trying to modify it
+
+except Exception as e:  # Exception = openpyxl.utils.exceptions.ReadOnlyWorkbookException
+    print("There was some error due to " + str(e))
+
 
 sheet['E1'] = "U_Avg"  
 sheet['F1'] = "V_Avg"
@@ -84,10 +96,15 @@ def octant_transition_count(mod = 5000):
     sheet['U2'] = f'= COUNTIF($K$2:$K${row_count},U1)'
 
 
-    # Creating a temporary column containg one next values of octant
-    sheet['AM1'] = "Temp_Column"
-    for i in range(row_count):
-        sheet[f'AM{i + 2}'] = f'= K{i + 3}'
+    try:
+        # Creating a temporary column containg one next values of octant
+        sheet['AM1'] = "Temp_Column"
+        for i in range(row_count):
+            sheet[f'AM{i + 2}'] = f'= K{i + 3}'
+
+    except:  # Exception = Unknown
+        print("An Unknown error ocurred")
+    
 
     # Creating List of cols value which will be used later
     cols = ['+1', '-1', '+2', '-2', '+3', '-3', '+4', '-4']
@@ -163,9 +180,14 @@ def octant_transition_count(mod = 5000):
         sheet[f'T{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "+4")'
         sheet[f'U{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $AM$2:$AM${row_count}, "-4")'
 
+    try:
+        # Saving the Output file
+        wb.save("output_octant_transition_identify.xlsx")
+        # Above line can have error if the workbook has already been saved
+        # and we are trying to save it again
 
-    # Saving the Output file
-    wb.save("output_octant_transition_identify.xlsx")
+    except Exception as e:  # Exception = openpyxl.utils.exceptions.WorkbookAlreadySaved
+        print("There was some error due to " + str(e))
 
 ver = python_version()
 
@@ -174,5 +196,10 @@ if ver == "3.8.10":
 else:
     print("Please install 3.8.10. Instruction are present in the GitHub Repo/Webmail. Url: https://pastebin.com/nvibxmjw")
 
-mod = 5000
+try:
+    mod = 5000
+    # Error if mod is not an integer
+except Exception as e:
+    print("There was some error due to " + str(e))
+
 octant_transition_count(mod)
