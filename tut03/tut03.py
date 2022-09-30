@@ -9,6 +9,25 @@ import pandas as pd
 from datetime import datetime
 start_time = datetime.now()
 
+# Function to find the octant value and label it for a particular row
+# taken row as an input
+def label_octant (row):
+    if row["U' = U - U_avg"] >= 0 and row["V' = V - V_avg"] >= 0 and row["W' = W - W_avg"] >= 0:
+        return 1
+    elif row["U' = U - U_avg"] < 0 and row["V' = V - V_avg"] >= 0 and row["W' = W - W_avg"] >= 0:
+        return 2
+    elif row["U' = U - U_avg"] < 0 and row["V' = V - V_avg"] < 0 and row["W' = W - W_avg"] >= 0:
+        return 3
+    elif row["U' = U - U_avg"] >= 0 and row["V' = V - V_avg"] < 0 and row["W' = W - W_avg"] >= 0:
+        return 4
+    elif row["U' = U - U_avg"] >= 0 and row["V' = V - V_avg"] >= 0 and row["W' = W - W_avg"] < 0:
+        return -1
+    elif row["U' = U - U_avg"] < 0 and row["V' = V - V_avg"] >= 0 and row["W' = W - W_avg"] < 0:
+        return -2
+    elif row["U' = U - U_avg"] < 0 and row["V' = V - V_avg"] < 0 and row["W' = W - W_avg"] < 0:
+        return -3
+    elif row["U' = U - U_avg"] >= 0 and row["V' = V - V_avg"] < 0 and row["W' = W - W_avg"] < 0:
+        return -4
 
 # Loading input csv file into a dataframe (df)
 file = "input_octant_longest_subsequence.xlsx"
@@ -30,6 +49,12 @@ df["U' = U - U_avg"] = df["U"] - U_avg
 df["V' = V - V_avg"] = df["V"] - V_avg
 df["W' = W - W_avg"] = df["W"] - W_avg
 
+# Constructing a new column of Octant and applying logic given below
+# Using lambda function on a particular row to find its octant via pre defined function (label_octant())
+df["Octant"] = df.apply(lambda row: label_octant(row), axis = 1)
+
+# Adding an empty column as shown in the given output file
+df[""] = ""
 
 def octant_longest_subsequence_count():
     print("Thinking what to code")
