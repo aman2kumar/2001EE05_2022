@@ -29,9 +29,17 @@ def label_octant (row):
     elif row["U' = U - U_avg"] >= 0 and row["V' = V - V_avg"] < 0 and row["W' = W - W_avg"] < 0:
         return -4
 
-# Loading input csv file into a dataframe (df)
-file = "input_octant_longest_subsequence.xlsx"
-df = pd.read_excel(file)
+
+try:
+    # Loading input csv file into a dataframe (df)
+    file = "input_octant_longest_subsequence.xlsx"
+    df = pd.read_excel(file)
+    # Above line can have error if input file has wrong format
+    # other than .xlsx
+
+except Exception as e:  # Exception = openpyxl.utils.exceptions.InvalidFileException
+    print("There was some error due to " + str(e))
+
 
 # Calculating averages of U, V and W
 U_avg = df["U"].mean()
@@ -115,8 +123,13 @@ def octant_longest_subsequence_count():
     # Printing dataframe df
     print(df)
 
-    # Forming csv file from the dataframe
-    df.to_excel("output_octant_longest_subsequence.xlsx", index = False)
+    try:
+        # Forming csv file from the dataframe
+        df.to_excel("output_octant_longest_subsequence.xlsx", index = False)
+        # Above line can have error if the workbook has already been saved
+
+    except Exception as e:  # Exception
+        print("There was some error due to " + str(e))
 
 ver = python_version()
 
