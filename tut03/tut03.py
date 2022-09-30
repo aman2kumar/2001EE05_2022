@@ -56,9 +56,43 @@ df["Octant"] = df.apply(lambda row: label_octant(row), axis = 1)
 # Adding an empty column as shown in the given output file
 df[""] = ""
 
+# Calculating total rows
+total_rows = len(df.axes[0])
+
+# Original function to find octant longest subsequence count
 def octant_longest_subsequence_count():
-    print("Thinking what to code")
-    # code
+    # Defining Lists for different values of subsequence length for their respective octant values
+    octant_values = [+1, -1, +2, -2, +3, -3, +4, -4]
+    subsequence_length = [0, 0, 0, 0, 0, 0, 0, 0]
+    max_subsequence_length = [-1, -1, -1, -1, -1, -1, -1, -1]
+
+    # Iteration for each row
+    for i in range(total_rows - 1):
+
+        # Iteration for each octant values
+        for j in range(8):
+
+            # If the value of Octant at index i == any octant values in the List
+            if(df.loc[df.index[i], 'Octant'] == octant_values[j]):
+                # Then check for next octant value
+                if(df.loc[df.index[i + 1], 'Octant'] == octant_values[j] and i != total_rows - 2):
+                    # if it is equal to previous octant value
+                    # increment subsequence length by 1
+                    subsequence_length[j] += 1
+                else:
+                    # else set subsequence length to 0
+                    subsequence_length[j] = 0
+
+                # define max subseq length as the maximum of the two
+                max_subsequence_length[j] = max(max_subsequence_length[j], subsequence_length[j])
+                break
+    
+    # Printing the calculated max suseq length in the respective cells
+    for i in range(8):
+        df.loc[df.index[i], 'Octant No'] = octant_values[i]
+        # Added 1 to the value because a single occurence also has the length 1
+        df.loc[df.index[i], 'Longest Subsequence Length'] = max_subsequence_length[i] + 1
+
     # Printing dataframe df
     print(df)
 
