@@ -55,6 +55,17 @@ df["U' = U - U_avg"] = df["U"] - U_avg
 df["V' = V - V_avg"] = df["V"] - V_avg
 df["W' = W - W_avg"] = df["W"] - W_avg
 
+# Constructing a new column of Octant and applying logic given below
+# Using lambda function on a particular row to find its octant via pre defined function (label_octant())
+df["Octant"] = df.apply(lambda row: label_octant(row), axis = 1)
+
+# Adding an empty column as shown in the given output file
+df[""] = ""
+
+# Calculating total rows
+total_rows = len(df.axes[0])
+
+# Original function to find octant longest subsequence count
 def octant_longest_subsequence_count_with_range():
     # Printing dataframe df
     print(df)
