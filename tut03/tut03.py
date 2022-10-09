@@ -31,7 +31,7 @@ def label_octant (row):
 
 
 try:
-    # Loading input csv file into a dataframe (df)
+    # Loading input file into a dataframe (df)
     file = "input_octant_longest_subsequence.xlsx"
     df = pd.read_excel(file)
     # Above line can have error if input file has wrong format
@@ -121,7 +121,7 @@ def octant_longest_subsequence_count():
         df.loc[df.index[i], 'Count'] = max_subsequence_count[i]
 
     # Printing dataframe df
-    print(df)
+    # print(df)
 
     try:
         # Forming csv file from the dataframe
