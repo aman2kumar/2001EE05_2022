@@ -116,7 +116,10 @@ def octant_transition_count(mod = 5000):
         # start = starting value of a given range
         # end = ending value of a given range
         start = i*mod
-        end = (i + 1)*mod - 1
+        if(i == iter):
+            end = row_count
+        else:
+            end = (i + 1)*mod - 1
         sheet[f'M{4 + i}'] = f'{start} - {end}'
 
         # Direct formula to find the total count of a particular octant value in given range
