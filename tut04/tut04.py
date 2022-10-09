@@ -73,7 +73,10 @@ def octant_longest_subsequence_count_with_range():
     max_subsequence_length = [-1, -1, -1, -1, -1, -1, -1, -1]
     temp_subsequence_length = [0, 0, 0, 0, 0, 0, 0, 0]
     max_subsequence_count = [0, 0, 0, 0, 0, 0, 0, 0]
-
+    temp_start_time = [0, 0, 0, 0, 0, 0, 0, 0]
+    temp_end_time = [0, 0, 0, 0, 0, 0, 0, 0]
+    start_time = [[], [], [], [], [], [], [], []]
+    end_time = [[], [], [], [], [], [], [], []]
     # Iteration for each row
     for i in range(total_rows - 1):
 
@@ -99,15 +102,16 @@ def octant_longest_subsequence_count_with_range():
     for i in range(total_rows - 1):
         for j in range(8):
             if(df.loc[df.index[i], 'Octant'] == octant_values[j]):
-                if(df.loc[df.index[i + 1], 'Octant'] == octant_values[j] and i != total_rows - 2):
-                    # This time storing the suseq length in temp_subsequence_length
+                temp_start_time[j] = df.loc[df.index[i], 'Time']
+                temp_subsequence_length[j] = 0
+                while(df.loc[df.index[i], 'Octant'] == octant_values[j] and i != total_rows - 2):
                     temp_subsequence_length[j] += 1
-                else:
-                    # This time comparing the temp subseq length with the max subseq length
-                    if(temp_subsequence_length[j] == max_subsequence_length[j]):
-                        # If equals then, incrementing the count 
-                        max_subsequence_count[j] += 1
-                    temp_subsequence_length[j] = 0
+                    i += 1
+                temp_end_time[j] = df.loc[df.index[i - 1], 'Time']
+                if(temp_subsequence_length[j] == max_subsequence_length[j] + 1):
+                    max_subsequence_count[j] += 1
+                    start_time[j].append(temp_start_time[j])
+                    end_time[j].append(temp_end_time[j])
                 break
 
 
@@ -117,6 +121,33 @@ def octant_longest_subsequence_count_with_range():
         # Added 1 to the value because a single occurence also has the length 1
         df.loc[df.index[i], 'Longest Subsequence Length'] = max_subsequence_length[i] + 1
         df.loc[df.index[i], 'Count'] = max_subsequence_count[i]
+
+    df[" "] = ""
+    df.loc[df.index[0], 'Octant No.1'] = str(octant_values[0])
+    df.loc[df.index[1], 'Octant No.1'] = 'Time'
+    df.loc[df.index[0], 'Longest Subsequence Length.1'] = max_subsequence_length[0] + 1
+    df.loc[df.index[1], 'Longest Subsequence Length.1'] = 'From'
+    df.loc[df.index[2], 'Longest Subsequence Length.1'] = start_time[0][0]
+    df.loc[df.index[0], 'Count.1'] = max_subsequence_count[0]
+    df.loc[df.index[1], 'Count.1'] = 'To'
+    df.loc[df.index[2], 'Count.1'] = end_time[0][0]
+
+#df.append({'A':32}, ignore_index=True)
+    indent = max_subsequence_count.copy()
+    for i in range(1, 8):
+        indent[i] = indent[i] + indent[i - 1]
+    for i in range(1, 8):
+        df.loc[df.index[i*2 + indent[i - 1]], 'Octant No.1'] = str(octant_values[i])
+        df.loc[df.index[i*2 + indent[i - 1] + 1], 'Octant No.1'] = 'Time'
+        # Added 1 to the value because a single occurence also has the length 1
+        df.loc[df.index[i*2 + indent[i - 1]], 'Longest Subsequence Length.1'] = max_subsequence_length[i] + 1
+        df.loc[df.index[i*2 + indent[i - 1] + 1], 'Longest Subsequence Length.1'] = 'From'
+        for j in range(len(start_time[i])):
+            df.loc[df.index[i*2 + indent[i - 1] + 2 + j], 'Longest Subsequence Length.1'] = start_time[i][j]
+        df.loc[df.index[i*2 + indent[i - 1]], 'Count.1'] = max_subsequence_count[i]
+        df.loc[df.index[i*2 + indent[i - 1] + 1], 'Count.1'] = 'To'
+        for j in range(len(end_time[i])):
+            df.loc[df.index[i*2 + indent[i - 1] + 2 + j], 'Count.1'] = end_time[i][j]
 
     # Printing dataframe df
     print(df)
