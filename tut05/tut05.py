@@ -59,10 +59,58 @@ df["W' = W - W_avg"] = df["W"] - W_avg
 # Using lambda function on a particular row to find its octant via pre defined function (label_octant())
 df["Octant"] = df.apply(lambda row: label_octant(row), axis = 1)
 
+octant_name_id_mapping = {"1":"Internal outward interaction",
+    "-1":"External outward interaction", "2":"External Ejection",
+    "-2":"Internal Ejection", "3":"External inward interaction",
+    "-3":"Internal inward interaction", "4":"Internal sweep", "-4":"External sweep"}
+
+# Original function for octant identification
 def octant_range_names(mod = 5000):
 
-    # Printing dataframe df
-    print(df)
+    # Adding Column of User Input at respective value of row and column
+    df.at[2, ''] = 'User Input'
+
+    # Adding value of mod at respective row and column
+    df.at[2, 'Octant ID'] = 'Mod ' + str(mod)
+
+    # Calculated total rows in dataframe to get the iteration of the for loop
+    total_rows = len(df.axes[0])
+    iteration = int(total_rows/mod)
+
+    octant = [1, -1, 2, -2, 3, -3, 4, -4]
+    overall_count = []
+    
+    # Added the total count of different octant values in their respective columns
+    # ex- count_1 = len of dataframe df_range whose Octant value == 1
+    # axes[0] => 0 corresponds to rows
+    df.at[1, 'Octant ID'] = 'Overall Count'
+    for i in range(8):
+        count = len((df[df["Octant"] == octant[i]]).axes[0])
+        df.at[1, str(octant[i])] = count
+        overall_count.append([count, i + 1])
+
+    for i in range(8):
+        df.at[0, 'Rank ' + str(i + 1)] = octant[i]
+
+    # For loop to give the count of octants in the ranges of given mod value
+    for i in range(iteration + 1):
+
+        # Divided original dataframe in range based on no. of loops
+        # ex- for loop1 range = 0 to 5000, loop2 range = 5001 to 10000 and so on..
+        df_range = df[i*mod: (i + 1)*mod - 1]
+        mod_count = []
+
+        for j in range(8):
+            count_mod = len((df_range[df_range["Octant"] == octant[j]]).axes[0])
+            df.at[i + 3, str(octant[j])] = count_mod
+            mod_count.append([count_mod, j + 1])
+    
+        # Defined range based on loop value
+        # For last loop range = i*mod to total_rows else shown below
+        if i != int(iteration):
+            df.at[i + 3, 'Octant ID'] = str(i*mod) + ' - ' + str((i+1)*mod - 1)
+        else:
+            df.at[i + 3, 'Octant ID'] = str(i*mod) + ' - ' + str(total_rows)
 
     try:
         # Forming excel file from the dataframe
