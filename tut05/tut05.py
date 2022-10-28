@@ -31,7 +31,7 @@ def label_octant (row):
 
 try:
     # Loading input file into a dataframe (df)
-    file = "input_octant_longest_subsequence_with_range.xlsx"
+    file = "octant_input.xlsx"
     df = pd.read_excel(file)
     # Above line can have error if input file has wrong format
     # other than .xlsx
@@ -49,14 +49,30 @@ df.loc[df.index[0], 'U Avg'] = U_avg
 df.loc[df.index[0], 'V Avg'] = V_avg
 df.loc[df.index[0], 'W Avg'] = W_avg
 
+# Done preprocessing by subtracting averages from original U, V and W
+# and forming new columns respectively
+df["U' = U - U_avg"] = df["U"] - U_avg
+df["V' = V - V_avg"] = df["V"] - V_avg
+df["W' = W - W_avg"] = df["W"] - W_avg
+
+# Constructing a new column of Octant and applying logic given below
+# Using lambda function on a particular row to find its octant via pre defined function (label_octant())
+df["Octant"] = df.apply(lambda row: label_octant(row), axis = 1)
+
 def octant_range_names(mod = 5000):
 
+    # Printing dataframe df
+    print(df)
+
+    try:
+        # Forming excel file from the dataframe
+        df.to_excel("octant_output_ranking_excel.xlsx", index = False)
+        # Above line can have error if the workbook has already been saved
+
+    except Exception as e:  # Exception
+        print("There was some error due to " + str(e))
     
-    octant_name_id_mapping = {"1":"Internal outward interaction", "-1":"External outward interaction", "2":"External Ejection", "-2":"Internal Ejection", "3":"External inward interaction", "-3":"Internal inward interaction", "4":"Internal sweep", "-4":"External sweep"}
 
-
-
-from platform import python_version
 ver = python_version()
 
 if ver == "3.8.10":
