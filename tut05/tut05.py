@@ -79,7 +79,7 @@ def octant_range_names(mod = 5000):
 
     octant = [1, -1, 2, -2, 3, -3, 4, -4]
     overall_count = []
-    
+
     # Added the total count of different octant values in their respective columns
     # ex- count_1 = len of dataframe df_range whose Octant value == 1
     # axes[0] => 0 corresponds to rows
@@ -91,6 +91,15 @@ def octant_range_names(mod = 5000):
 
     for i in range(8):
         df.at[0, 'Rank ' + str(i + 1)] = octant[i]
+
+    overall_count.sort(reverse = True)
+    for i in range(8):
+        for j in range(8):
+            if overall_count[j][1] == i + 1:
+                df.at[1, 'Rank ' + str(i + 1)] = j + 1
+                df.at[1, 'Rank 1 Octant ID'] = octant[overall_count[0][1] - 1]
+                df.at[1, 'Rank 1 Octant Name'] = octant_name_id_mapping.get(str(octant[overall_count[0][1] - 1]))
+                break
 
     # For loop to give the count of octants in the ranges of given mod value
     for i in range(iteration + 1):
@@ -104,6 +113,15 @@ def octant_range_names(mod = 5000):
             count_mod = len((df_range[df_range["Octant"] == octant[j]]).axes[0])
             df.at[i + 3, str(octant[j])] = count_mod
             mod_count.append([count_mod, j + 1])
+
+        mod_count.sort(reverse = True)
+        for j in range(8):
+            for k in range(8):
+                if mod_count[k][1] == j + 1:
+                    df.at[i + 3, 'Rank ' + str(j + 1)] = k + 1
+                    df.at[i + 3, 'Rank 1 Octant ID'] = octant[mod_count[0][1] - 1]
+                    df.at[i + 3, 'Rank 1 Octant Name'] = octant_name_id_mapping.get(str(octant[mod_count[0][1] - 1]))   
+                    break
     
         # Defined range based on loop value
         # For last loop range = i*mod to total_rows else shown below
