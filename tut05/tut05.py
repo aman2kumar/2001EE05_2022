@@ -59,10 +59,8 @@ df["W' = W - W_avg"] = df["W"] - W_avg
 # Using lambda function on a particular row to find its octant via pre defined function (label_octant())
 df["Octant"] = df.apply(lambda row: label_octant(row), axis = 1)
 
-octant_name_id_mapping = {"1":"Internal outward interaction",
-    "-1":"External outward interaction", "2":"External Ejection",
-    "-2":"Internal Ejection", "3":"External inward interaction",
-    "-3":"Internal inward interaction", "4":"Internal sweep", "-4":"External sweep"}
+octant_name_id_mapping = {"1":"Internal outward interaction", "-1":"External outward interaction", "2":"External Ejection", "-2":"Internal Ejection", 
+"3":"External inward interaction", "-3":"Internal inward interaction", "4":"Internal sweep", "-4":"External sweep"}
 
 # Original function for octant identification
 def octant_range_names(mod = 5000):
@@ -129,6 +127,18 @@ def octant_range_names(mod = 5000):
             df.at[i + 3, 'Octant ID'] = str(i*mod) + ' - ' + str((i+1)*mod - 1)
         else:
             df.at[i + 3, 'Octant ID'] = str(i*mod) + ' - ' + str(total_rows)
+
+    df.at[iteration + 7, '1'] = 'Octant ID'
+    df.at[iteration + 7, '-1'] = 'Octant Name'
+    df.at[iteration + 7, '2'] = 'Count of Rank 1 Mod Values'
+    for i in range(8):
+        df.at[iteration + 8 + i, '1'] = octant[i]
+        df.at[iteration + 8 + i, '-1'] = octant_name_id_mapping.get(str(octant[i]))
+        if(i == 2):
+            df.at[iteration + 8 + i, '2'] = len((df[df["Rank 1 Octant ID"] == octant[i]]).axes[0]) - 1
+        else:
+            df.at[iteration + 8 + i, '2'] = len((df[df["Rank 1 Octant ID"] == octant[i]]).axes[0])
+
 
     try:
         # Forming excel file from the dataframe
