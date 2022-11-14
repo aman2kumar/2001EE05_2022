@@ -78,7 +78,53 @@ lecture_dates.sort()
 
 # Main function to find attendance report
 def attendance_report():
-    pass
+    # Loop for each student
+    for i in range(total_studs):
+        # Temp dataframe for individual student in this
+        roll_df = pd.DataFrame()
+        df = att_df[att_df["Roll No"] == stud_df.at[i, "Roll No"]]
+        length = len(df.axes[0])
+        total_attendance_count = []
+        real = []
+        duplicate = []
+        invalid = []
+        total_real = 0
+        # absent = 1 if real = 0 else 0
+        roll_df.at[0, "Date"] = None
+        for j in range(len(lecture_dates)):
+            roll_df.at[j + 1, "Date"] = lecture_dates[j]
+            total_attendance_count.append(0)
+            real.append(0)
+            duplicate.append(0)
+            invalid.append(0)
+            for k in range(length):
+                if df.loc[df.index[k], "Timestamp"].date() == lecture_dates[j]:
+                    total_attendance_count[j] += 1
+                    if(df.loc[df.index[k], "Timestamp"].time() >= class_start_time and df.loc[df.index[k], "Timestamp"].time() <= class_end_time):
+                        if real[j] == 0:
+                            real[j] = 1
+                        else:
+                            duplicate[j] += 1
+                    else:
+                        invalid[j] += 1
+        roll_df.at[0, "Roll"] = stud_df.at[i, "Roll No"]
+        roll_df.at[0, "Name"] = stud_df.at[i, "Name"]
+        roll_df.at[0, "Total Attendance Count"] = None
+        roll_df.at[0, "Real"] = None
+        roll_df.at[0, "Duplicate"] = None
+        roll_df.at[0, "Invalid"] = None
+        roll_df.at[0, "Absent"] = None
+        for j in range(len(lecture_dates)):
+            total_real += real[j]
+            roll_df.at[j + 1, "Total Attendance Count"] = total_attendance_count[j]
+            roll_df.at[j + 1, "Real"] = real[j]
+            roll_df.at[j + 1, "Duplicate"] = duplicate[j]
+            roll_df.at[j + 1, "Invalid"] = invalid[j]
+            if real[j] == 1:
+                roll_df.at[j, "Absent"] = 0
+            else:
+                roll_df.at[j + 1, "Absent"] = 1
+        roll_df.to_excel(f'output1/{stud_df.at[i, "Roll No"]}.xlsx', index = False)
 
 ver = python_version()
 
