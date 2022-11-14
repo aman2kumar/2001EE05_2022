@@ -124,7 +124,7 @@ def attendance_report():
                 roll_df.at[j, "Absent"] = 0
             else:
                 roll_df.at[j + 1, "Absent"] = 1
-        roll_df.to_excel(f'output1/{stud_df.at[i, "Roll No"]}.xlsx', index = False)
+        roll_df.to_excel(f'output/{stud_df.at[i, "Roll No"]}.xlsx', index = False)
 
 ver = python_version()
 
