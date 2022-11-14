@@ -76,6 +76,7 @@ class_end_time = datetime.datetime.strptime('15:00', '%H:%M').time()
 # Sorting lecture dates list
 lecture_dates.sort()
 
+consolidate_df = pd.DataFrame()
 # Main function to find attendance report
 def attendance_report():
     # Loop for each student
@@ -83,6 +84,8 @@ def attendance_report():
         # Temp dataframe for individual student in this
         roll_df = pd.DataFrame()
         df = att_df[att_df["Roll No"] == stud_df.at[i, "Roll No"]]
+        consolidate_df.at[i, "Roll"] = stud_df.at[i, "Roll No"]
+        consolidate_df.at[i, "Name"] = stud_df.at[i, "Name"]
         length = len(df.axes[0])
         total_attendance_count = []
         real = []
@@ -121,10 +124,17 @@ def attendance_report():
             roll_df.at[j + 1, "Duplicate"] = duplicate[j]
             roll_df.at[j + 1, "Invalid"] = invalid[j]
             if real[j] == 1:
-                roll_df.at[j, "Absent"] = 0
+                roll_df.at[j + 1, "Absent"] = 0
+                consolidate_df.at[i, f"{lecture_dates[j]}"] = "P"
             else:
                 roll_df.at[j + 1, "Absent"] = 1
+                consolidate_df.at[i, f"{lecture_dates[j]}"] = "A"
         roll_df.to_excel(f'output/{stud_df.at[i, "Roll No"]}.xlsx', index = False)
+        consolidate_df.at[i, "Actual Lecture Taken"] = len(lecture_dates)
+        consolidate_df.at[i, "Total Real"] = total_real
+        consolidate_df.at[i, "% Attendance"] = float("%.2f"%((total_real/len(lecture_dates))*100))
+    consolidate_df.to_excel('output/attendance_report_consolidated.xlsx', index = False)
+
 
 ver = python_version()
 
