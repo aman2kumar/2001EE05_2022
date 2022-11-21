@@ -1,6 +1,13 @@
 # Importing different modules
 from platform import python_version
 
+from msilib.schema import Font
+from platform import python_version
+# A Python library to read/write Excel file
+import openpyxl as op
+# For changing the style of a particular cell like changing colours, fonts or apply borders
+from openpyxl.styles import PatternFill, Font
+
 # Pandas is used for working on datasets
 # It is simpler and easy to use
 import pandas as pd
@@ -99,13 +106,13 @@ def octant_analysis(mod = 5000):
         overall_count.append([count, i + 1])
 
     for i in range(8):
-        df.at[0, 'Rank ' + str(i + 1)] = octant[i]
+        df.at[0, 'Rank ' + str(octant[i])] = octant[i]
 
     overall_count.sort(reverse = True)
     for i in range(8):
         for j in range(8):
             if overall_count[j][1] == i + 1:
-                df.at[1, 'Rank ' + str(i + 1)] = j + 1
+                df.at[1, 'Rank ' + str(octant[i])] = j + 1
                 df.at[1, 'Rank 1 Octant ID'] = octant[overall_count[0][1] - 1]
                 df.at[1, 'Rank 1 Octant Name'] = octant_name_id_mapping.get(str(octant[overall_count[0][1] - 1]))
                 break
@@ -127,7 +134,7 @@ def octant_analysis(mod = 5000):
         for j in range(8):
             for k in range(8):
                 if mod_count[k][1] == j + 1:
-                    df.at[i + 2, 'Rank ' + str(j + 1)] = k + 1
+                    df.at[i + 2, 'Rank ' + str(octant[j])] = k + 1
                     df.at[i + 2, 'Rank 1 Octant ID'] = octant[mod_count[0][1] - 1]
                     df.at[i + 2, 'Rank 1 Octant Name'] = octant_name_id_mapping.get(str(octant[mod_count[0][1] - 1]))   
                     break
@@ -150,8 +157,10 @@ def octant_analysis(mod = 5000):
         else:
             df.at[iteration + 8 + i, '2'] = len((df[df["Rank 1 Octant ID"] == octant[i]]).axes[0])
 
-
-    df["  "] = ""
+    space_list = ["  ", "   ", "    ", "     ", "      ", "       ", "        ", "         ", "          ", "           ", "            ", "             "]
+    for i in range(len(space_list)):
+        df[space_list[i]] = ""
+    
     # Defining Lists for different values of subsequence length for their respective octant values
     octant_values = [+1, -1, +2, -2, +3, -3, +4, -4]
     subsequence_length = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -256,7 +265,101 @@ def octant_analysis(mod = 5000):
 
     except Exception as e:  # Exception
         print("There was some error due to " + str(e))
-###Code
+
+    try:
+        # Loading the given input file in a Workbook
+        wb = op.load_workbook('octant_output_ranking_excel.xlsx')
+        # Above line can have error if input file has wrong format
+        # other than .xlsx
+
+    except Exception as e:  # Exception = openpyxl.utils.exceptions.InvalidFileException
+        print("There was some error due to " + str(e))
+
+    try:
+        # Selecting the current active sheet
+        sheet = wb.active
+        # Above line can have error if input file is read only workbook
+        # and we are trying to modify it
+
+    except Exception as e:  # Exception = openpyxl.utils.exceptions.ReadOnlyWorkbookException
+        print("There was some error due to " + str(e))
+
+    # Total rows
+    row_count = sheet.max_row
+
+    try:
+        # Creating a temporary column containg one next values of octant
+        sheet['BM1'] = "Temp_Column"
+        for i in range(row_count):
+            sheet[f'BM{i + 2}'] = f'= K{i + 3}'
+
+    except:  # Exception = Unknown
+        print("An Unknown error ocurred")
+
+
+    # Creating List of cols value which will be used later
+    cols = ['+1', '-1', '+2', '-2', '+3', '-3', '+4', '-4']
+
+    # No of iterations for the below loop
+    iter = row_count//mod
+
+    for i in range(iter + 1):
+        # start = starting value of a given range
+        # end = ending value of a given range
+        start = i*mod
+        if(i == iter):
+            end = row_count
+        else:
+            end = (i + 1)*mod - 1
+
+        # Assigning cell values for Transition count tables for each iteration
+        sheet[f'AH{30 + i*13}'] = 'From'
+        sheet[f'AI{27 + i*13}'] = 'Mod Transition Count'
+        sheet[f'AI{28 + i*13}'] = f'{start} - {end}'
+        sheet[f'AI{29 + i*13}'] = 'Count'
+        sheet[f'AJ{28 + i*13}'] = 'To'
+
+        sheet[f'AJ{29 + i*13}'] = sheet[f'AI{30 + i*13}'] = '+1'
+        sheet[f'AK{29 + i*13}'] = sheet[f'AI{31 + i*13}'] = '-1'
+        sheet[f'AL{29 + i*13}'] = sheet[f'AI{32 + i*13}'] = '+2'
+        sheet[f'AM{29 + i*13}'] = sheet[f'AI{33 + i*13}'] = '-2'
+        sheet[f'AN{29 + i*13}'] = sheet[f'AI{34 + i*13}'] = '+3'
+        sheet[f'AO{29 + i*13}'] = sheet[f'AI{35 + i*13}'] = '-3'
+        sheet[f'AP{29 + i*13}'] = sheet[f'AI{36 + i*13}'] = '+4'
+        sheet[f'AQ{29 + i*13}'] = sheet[f'AI{37 + i*13}'] = '-4'
+
+        # Finding Transition count by comparing 2 columns, one of which contains one next values of the octant
+        for j in range(8):
+            sheet[f'AJ{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+1")'
+            sheet[f'AK{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-1")'
+            sheet[f'AL{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+2")'
+            sheet[f'AM{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-2")'
+            sheet[f'AN{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+3")'
+            sheet[f'AO{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-3")'
+            sheet[f'AP{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+4")'
+            sheet[f'AQ{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-4")'
+
+    
+    # Finding overall Transition count by comparing 2 columns same as above
+    for j in range(8):
+        sheet[f'AJ{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+1")'
+        sheet[f'AK{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-1")'
+        sheet[f'AL{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+2")'
+        sheet[f'AM{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-2")'
+        sheet[f'AN{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+3")'
+        sheet[f'AO{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-3")'
+        sheet[f'AP{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+4")'
+        sheet[f'AQ{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-4")'
+
+    try:
+        # Saving the Output file
+        wb.save("output_octant_transition_identify.xlsx")
+        # Above line can have error if the workbook has already been saved
+        # and we are trying to save it again
+
+    except Exception as e:  # Exception = openpyxl.utils.exceptions.WorkbookAlreadySaved
+        print("There was some error due to " + str(e))
+
 
 
 ver = python_version()
