@@ -67,10 +67,8 @@ indBalling = pd.DataFrame(0, indBaller, ["O", "M", "R", "W", "NB", "WD", "ECO"])
 pakBatting = pd.DataFrame(0, pakBatter, ["Status", "R", "B", "4s", "6s", "SR"])
 pakBalling = pd.DataFrame(0, pakBaller, ["O", "M", "R", "W", "NB", "WD", "ECO"])
 
-indPowerplay = pd.DataFrame()
-pakPowerplay = pd.DataFrame()
-indPowerplay.at[0, "Powerplays"] = "Mandatory"
-pakPowerplay.at[0, "Powerplays"] = "Mandatory"
+indPowerplay_runs = 0
+pakPowerplay_runs = 0
 
 ind_score = 0
 ind_wkts = 0
@@ -96,8 +94,7 @@ for i in range(total_balls_ind):
 	baller = line_ind[i][1]
 	line_ind[i][3] = line_ind[i][3].lower()
 	if line_ind[i][0] == "6.1":
-		pakPowerplay.at[0, "Overs"] = "0.1-6.0"
-		pakPowerplay.at[0, "Runs"] = ind_score
+		pakPowerplay_runs = ind_score
 	if "wide" in line_ind[i][3]:
 		temp = re.findall("[0-9]", line_ind[i][3])
 		if len(temp) == 0:
@@ -196,8 +193,7 @@ for i in range(total_balls_pak):
 	baller = line_pak[i][1]
 	line_pak[i][3] = line_pak[i][3].lower()
 	if line_pak[i][0] == "6.1":
-		pakPowerplay.at[0, "Overs"] = "0.1-6.0"
-		pakPowerplay.at[0, "Runs"] = pak_score
+		indPowerplay_runs = pak_score
 	if "wide" in line_pak[i][3]:
 		temp = re.findall("[0-9]", line_pak[i][3])
 		if len(temp) == 0:
@@ -308,19 +304,48 @@ print(indBatting)
 print(pakBalling)
 print(ind_score, ind_legBye, ind_bye, ind_noBall, ind_wide)
 print(ind_fall_of_wkts)
-print(indPowerplay)
 
 print(pakBatting)
 print(indBalling)
 print(pak_score, pak_legBye, pak_bye, pak_noBall, pak_wide)
 print(pak_fall_of_wkts)
-print(pakPowerplay)
+ind_extra = ind_bye + ind_legBye + ind_wide + ind_noBall
+pak_extra = pak_bye + pak_legBye + pak_wide + pak_noBall
 
 def scorecard():
-	pass
+	OUTPUT=open('Scorecard.txt','w')
+	OUTPUT.write(' Pakistan Innings\n')
+	OUTPUT.write(f"{pak_score : >50}-{pak_wkts} ({indBalling['O'].sum()} Ov)")
+	OUTPUT.write('\n Batter\n')
+	OUTPUT.write(str(pakBatting)) 
+	OUTPUT.write('\n Extras\t\t\t\t\t\t\t\t\t   '+str(pak_extra)+' (b '+str(pak_bye)+', lb '+str(pak_legBye)+', w '+str(pak_wide)+', nb '+str(pak_noBall)+')') 
+	OUTPUT.write('\n Total \t\t\t\t\t\t\t\t\t   '+str(pak_score)+' ('+str(pak_wkts)+' wkts, '+str(indBalling['O'].sum())+' Ov)\n') 
+	OUTPUT.write('\n Fall of Wickets\n ')
+	OUTPUT.write(', '.join(pak_fall_of_wkts))
+	OUTPUT.write('\n\n')
+	OUTPUT.write('Bowler\n')
+	OUTPUT.write(str(indBalling))
+	OUTPUT.write('\n')
+	OUTPUT.write('\nPowerplays\t    '+'Overs\t\t\t    '+'Runs')
+	OUTPUT.write('\nMandatory\t    '+'0.1-6\t\t\t\t'+str(indPowerplay_runs)+'\n')
+	OUTPUT.write('\n\n\n')
+
+	OUTPUT.write(' India Innings\n')
+	OUTPUT.write(f"{ind_score : >50}-{ind_wkts} ({pakBalling['O'].sum()} Ov)")
+	OUTPUT.write('\n Batter\n')
+	OUTPUT.write(str(indBatting)) 
+	OUTPUT.write('\n Extras\t\t\t\t\t\t\t\t\t\t   '+str(ind_extra)+' (b '+str(ind_bye)+', lb '+str(ind_legBye)+', w '+str(ind_wide)+', nb '+str(ind_noBall)+')') 
+	OUTPUT.write('\n Total \t\t\t\t\t\t\t\t\t\t   '+str(ind_score)+' ('+str(ind_wkts)+' wkts, '+str(pakBalling['O'].sum())+' Ov)\n') 
+	OUTPUT.write('\n Fall of Wickets\n ')
+	OUTPUT.write(', '.join(ind_fall_of_wkts))
+	OUTPUT.write('\n\n')
+	OUTPUT.write('Bowler\n')
+	OUTPUT.write(str(indBalling))
+	OUTPUT.write('\n')
+	OUTPUT.write('\nPowerplays\t    '+'Overs\t\t\t    '+'Runs')
+	OUTPUT.write('\nMandatory\t    '+'0.1-6\t\t\t\t'+str(pakPowerplay_runs)+'\n')
 
 
-###Code
 
 from platform import python_version
 ver = python_version()
