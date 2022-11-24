@@ -6,7 +6,7 @@ from platform import python_version
 # A Python library to read/write Excel file
 import openpyxl as op
 # For changing the style of a particular cell like changing colours, fonts or apply borders
-from openpyxl.styles import PatternFill, Font
+from openpyxl.styles import PatternFill, Font, Border, Side
 
 # Pandas is used for working on datasets
 # It is simpler and easy to use
@@ -106,7 +106,7 @@ def octant_analysis(mod = 5000):
         overall_count.append([count, i + 1])
 
     for i in range(8):
-        df.at[0, 'Rank ' + str(octant[i])] = octant[i]
+        df.at[0, 'Rank ' + str(octant[i])] = ""
 
     overall_count.sort(reverse = True)
     for i in range(8):
@@ -227,7 +227,7 @@ def octant_analysis(mod = 5000):
         df.loc[df.index[i], 'Count'] = max_subsequence_count[i]
 
     # Printing the time range according to the given format
-    df[" "] = ""
+    df["               "] = ""
     df.loc[df.index[0], 'Octant No '] = str(octant_values[0])
     df.loc[df.index[1], 'Octant No '] = 'Time'
     df.loc[df.index[0], 'Longest Subsequence Length '] = max_subsequence_length[0] + 1
@@ -284,6 +284,10 @@ def octant_analysis(mod = 5000):
     except Exception as e:  # Exception = openpyxl.utils.exceptions.ReadOnlyWorkbookException
         print("There was some error due to " + str(e))
 
+    # Defining Border type
+    thin_border = Border(left = Side(style = 'thin'), right = Side(style = 'thin'), 
+                            top = Side(style = 'thin'), bottom = Side(style = 'thin'))
+
     # Total rows
     row_count = sheet.max_row
 
@@ -302,7 +306,19 @@ def octant_analysis(mod = 5000):
 
     # No of iterations for the below loop
     iter = row_count//mod
+    sheet[f'AH4'] = 'From'
+    sheet[f'AI1'] = 'Overall Transition Count'
+    sheet[f'AI3'] = 'Octant #'
+    sheet[f'AJ2'] = 'To'
 
+    sheet[f'AJ3'] = sheet[f'AI4'] = '+1'
+    sheet[f'AK3'] = sheet[f'AI5'] = '-1'
+    sheet[f'AL3'] = sheet[f'AI6'] = '+2'
+    sheet[f'AM3'] = sheet[f'AI7'] = '-2'
+    sheet[f'AN3'] = sheet[f'AI8'] = '+3'
+    sheet[f'AO3'] = sheet[f'AI9'] = '-3'
+    sheet[f'AP3'] = sheet[f'AI10'] = '+4'
+    sheet[f'AQ3'] = sheet[f'AI11'] = '-4'
     for i in range(iter + 1):
         # start = starting value of a given range
         # end = ending value of a given range
@@ -313,43 +329,94 @@ def octant_analysis(mod = 5000):
             end = (i + 1)*mod - 1
 
         # Assigning cell values for Transition count tables for each iteration
-        sheet[f'AH{30 + i*13}'] = 'From'
-        sheet[f'AI{27 + i*13}'] = 'Mod Transition Count'
-        sheet[f'AI{28 + i*13}'] = f'{start} - {end}'
-        sheet[f'AI{29 + i*13}'] = 'Count'
-        sheet[f'AJ{28 + i*13}'] = 'To'
+        sheet[f'AH{18 + i*13}'] = 'From'
+        sheet[f'AI{15 + i*13}'] = 'Mod Transition Count'
+        sheet[f'AI{16 + i*13}'] = f'{start} - {end}'
+        sheet[f'AI{17 + i*13}'] = 'Octant #'
+        sheet[f'AJ{16 + i*13}'] = 'To'
 
-        sheet[f'AJ{29 + i*13}'] = sheet[f'AI{30 + i*13}'] = '+1'
-        sheet[f'AK{29 + i*13}'] = sheet[f'AI{31 + i*13}'] = '-1'
-        sheet[f'AL{29 + i*13}'] = sheet[f'AI{32 + i*13}'] = '+2'
-        sheet[f'AM{29 + i*13}'] = sheet[f'AI{33 + i*13}'] = '-2'
-        sheet[f'AN{29 + i*13}'] = sheet[f'AI{34 + i*13}'] = '+3'
-        sheet[f'AO{29 + i*13}'] = sheet[f'AI{35 + i*13}'] = '-3'
-        sheet[f'AP{29 + i*13}'] = sheet[f'AI{36 + i*13}'] = '+4'
-        sheet[f'AQ{29 + i*13}'] = sheet[f'AI{37 + i*13}'] = '-4'
-
+        sheet[f'AJ{17 + i*13}'] = sheet[f'AI{18 + i*13}'] = '+1'
+        sheet[f'AK{17 + i*13}'] = sheet[f'AI{19 + i*13}'] = '-1'
+        sheet[f'AL{17 + i*13}'] = sheet[f'AI{20 + i*13}'] = '+2'
+        sheet[f'AM{17 + i*13}'] = sheet[f'AI{21 + i*13}'] = '-2'
+        sheet[f'AN{17 + i*13}'] = sheet[f'AI{22 + i*13}'] = '+3'
+        sheet[f'AO{17 + i*13}'] = sheet[f'AI{23 + i*13}'] = '-3'
+        sheet[f'AP{17 + i*13}'] = sheet[f'AI{24 + i*13}'] = '+4'
+        sheet[f'AQ{17 + i*13}'] = sheet[f'AI{25 + i*13}'] = '-4'
+        
         # Finding Transition count by comparing 2 columns, one of which contains one next values of the octant
         for j in range(8):
-            sheet[f'AJ{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+1")'
-            sheet[f'AK{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-1")'
-            sheet[f'AL{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+2")'
-            sheet[f'AM{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-2")'
-            sheet[f'AN{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+3")'
-            sheet[f'AO{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-3")'
-            sheet[f'AP{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+4")'
-            sheet[f'AQ{30 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-4")'
+            sheet[f'AJ{18 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+1")'
+            sheet[f'AK{18 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-1")'
+            sheet[f'AL{18 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+2")'
+            sheet[f'AM{18 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-2")'
+            sheet[f'AN{18 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+3")'
+            sheet[f'AO{18 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-3")'
+            sheet[f'AP{18 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "+4")'
+            sheet[f'AQ{18 + i*13 + j}'] = f'= COUNTIFS($K${start + 2}:$K${end + 2}, {cols[j]}, $BM${start + 2}:$BM${end + 2}, "-4")'
 
-    
     # Finding overall Transition count by comparing 2 columns same as above
     for j in range(8):
-        sheet[f'AJ{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+1")'
-        sheet[f'AK{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-1")'
-        sheet[f'AL{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+2")'
-        sheet[f'AM{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-2")'
-        sheet[f'AN{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+3")'
-        sheet[f'AO{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-3")'
-        sheet[f'AP{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+4")'
-        sheet[f'AQ{16 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-4")'
+        sheet[f'AJ{4 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+1")'
+        sheet[f'AK{4 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-1")'
+        sheet[f'AL{4 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+2")'
+        sheet[f'AM{4 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-2")'
+        sheet[f'AN{4 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+3")'
+        sheet[f'AO{4 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-3")'
+        sheet[f'AP{4 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "+4")'
+        sheet[f'AQ{4 + j}'] = f'= COUNTIFS($K$2:$K${row_count}, {cols[j]}, $BM$2:$BM${row_count}, "-4")'
+
+    highlight_columns = ["W", "X", "Y", "Z", "AA", "AB", "AC", "AD"]
+    for i in range(iter + 1):
+        for col in highlight_columns:
+            if sheet[f'{col}{1}'] == "1":
+                # Fills the selected colour in the chosen cell
+                sheet['L3'].fill = PatternFill(start_color = 'FFFF00', end_color = 'FFFF00', fill_type = 'solid')
+
+
+    # Below code is to add borders in respective group of cells
+    sheet['L3'].fill = PatternFill(start_color = 'FFFF00', end_color = 'FFFF00', fill_type = 'solid')
+    overall_count_columns = ["N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF"]
+    for col in overall_count_columns:
+        range_cell = sheet[f'{col}{3}':f'{col}{iter + 4}']
+        for cell in range_cell:
+            for x in cell:
+                x.border = thin_border
+    
+    transition_count_column = ["AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ"]
+    for col in transition_count_column:
+        range_cell = sheet[f'{col}{3}':f'{col}{11}']
+        for cell in range_cell:
+            for x in cell:
+                x.border = thin_border
+    for i in range(iter + 1):
+        for col in transition_count_column:
+            range_cell = sheet[f'{col}{17 + i*13}':f'{col}{25 + i*13}']
+            for cell in range_cell:
+                for x in cell:
+                    x.border = thin_border
+
+
+    longest_sub_column = ["AS", "AT", "AU"]
+    for col in longest_sub_column:
+        range_cell = sheet[f'{col}{1}':f'{col}{9}']
+        for cell in range_cell:
+            for x in cell:
+                x.border = thin_border
+
+    longest_sub_wrange_column = ["AW", "AX", "AY"]
+    for col in longest_sub_wrange_column:
+        range_cell = sheet[f'{col}{1}':f'{col}{25}']
+        for cell in range_cell:
+            for x in cell:
+                x.border = thin_border
+    
+    below_column = ["O", "P", "Q"]
+    for col in below_column:
+        range_cell = sheet[f'{col}{12}':f'{col}{20}']
+        for cell in range_cell:
+            for x in cell:
+                x.border = thin_border
 
     try:
         # Saving the Output file
